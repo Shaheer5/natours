@@ -14,6 +14,14 @@ exports.checkId = (req, res, next, val) => {
   next();
 };
 
+exports.checkBody = (req, res, next, val) => {
+  const id = req.params.id * 1;
+  if (id.name) {
+    console.log(id.name);
+  }
+  next();
+};
+
 exports.getTours = (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -92,7 +100,6 @@ exports.updateTour = (req, res) => {
 
 // Delete the Tour
 exports.deleteTour = (req, res) => {
-  
   const updateTour = tours.filter((el) => el.id !== req.params.id * 1);
   tours.length = 0;
   tours.push(...updateTour);
