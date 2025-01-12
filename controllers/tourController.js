@@ -14,11 +14,13 @@ exports.checkId = (req, res, next, val) => {
   next();
 };
 
-exports.checkBody = (req, res, next, val) => {
-  const id = req.params.id * 1;
-  if (id.name) {
-    console.log(id.name);
-  }
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price)
+    return res.status(404).json({
+      status: 'failed',
+      message: 'Missing tour name or tour price',
+    });
+
   next();
 };
 
