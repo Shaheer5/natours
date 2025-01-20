@@ -1,11 +1,12 @@
 const dotenv = require('dotenv');
-const app = require('./app');
 const mongoose = require('mongoose');
-dotenv.config({ path: './config.env' });
+const app = require('./app');
+
+dotenv.config({ path: './global.env' });
 
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
+  process.env.DATABASE_PASSWORD,
 );
 
 mongoose
@@ -16,7 +17,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then((db) =>
-    console.log(db.connections[0].name + ' database connected successfully')
+    console.log(db.connections[0].name + ' database connected successfully'),
   );
 
 const tourSchema = mongoose.Schema({
@@ -36,6 +37,21 @@ const tourSchema = mongoose.Schema({
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
+
+const testTour = new Tour({
+  name: 'The Shark Eater',
+  price: 597,
+  rating: 4.7,
+});
+
+testTour
+  .save()
+  .then((doc) => {
+    console.log(doc);
+  })
+  .catch((err) => {
+    console.log('Error 💣:', err);
+  });
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

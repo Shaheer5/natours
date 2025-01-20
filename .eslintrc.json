@@ -3,6 +3,7 @@
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",
+    "linebreak-style": ["off", "unix"],
     "spaced-comment": "off",
     "no-console": "warn",
     "consistent-return": "off",
