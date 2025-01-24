@@ -86,7 +86,7 @@ exports.deleteTour = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: "couldn't delete the tour",
+      message: err,
     });
   }
 };
