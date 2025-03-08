@@ -5,26 +5,28 @@ exports.getTours = async (req, res) => {
   try {
     // 1.1) Filtering
     const queryObj = { ...req.query };
-    const excludeFilters = ['page', 'limit'];
+    const excludeFilters = ['limit', 'sort', 'page', 'fields'];
     excludeFilters.forEach((el) => delete queryObj[el]);
 
     // 1.2) Advanced Filtering
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    const query = Tour.find(JSON.parse(queryStr));
+    let query = Tour.find(JSON.parse(queryStr));
 
     // 2) Sorting
     if (req.query.sort) {
       const sortBy = req.query.sort.split(',').join(' ');
+
       query = query.sort(sortBy);
     } else {
-      query.sortBy('-createdAt');
+      query.sort('-ratingsAverage');
     }
 
     // 3) Fields
     if (req.query.fields) {
       const fields = req.query.fields.split(',').join(' ');
       query = query.select(fields);
+      console.log(fields);
     } else {
       query.select('-__v');
     }
@@ -40,7 +42,7 @@ exports.getTours = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: err,
+      message: err.message,
     });
   }
 };
