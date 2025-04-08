@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures');
+const AppError = require('./../utils/appError');
 const catchAsyncError = require('./../utils/catchAsyncError');
 
 exports.aliasTopTours = (req, res, next) => {
@@ -45,6 +46,10 @@ exports.createTour = catchAsyncError(async (req, res, next) => {
 // Get a single Tour
 exports.getTour = catchAsyncError(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
+
+  if (!tour) {
+    return next(new AppError("Couldn't find the tour", 404));
+  }
   res.status(200).json({
     status: 'success',
     data: {
@@ -57,8 +62,14 @@ exports.getTour = catchAsyncError(async (req, res, next) => {
 exports.updateTour = catchAsyncError(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidators: true,
+    // not working with price discount
+    // runValidators: true,
   });
+
+  if (!tour) {
+    return next(new AppError("Couldn't find the tour", 404));
+  }
+
   res.status(201).json({
     status: 'success',
     data: tour,
@@ -67,7 +78,11 @@ exports.updateTour = catchAsyncError(async (req, res, next) => {
 
 // Delete the Tour
 exports.deleteTour = catchAsyncError(async (req, res, next) => {
-  await Tour.findByIdAndRemove(req.params.id);
+  const tour = await Tour.findByIdAndRemove(req.params.id);
+
+  if (!tour) {
+    return next(new AppError("Couldn't find the tour", 404));
+  }
   res.status(204).json({
     status: 'success',
     data: null,
