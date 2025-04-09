@@ -63,7 +63,7 @@ exports.updateTour = catchAsyncError(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     // not working with price discount
-    // runValidators: true,
+    runValidators: true,
   });
 
   if (!tour) {
