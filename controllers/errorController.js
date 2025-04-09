@@ -34,7 +34,7 @@ const sendErrorProd = (err, res) => {
 
     // Programming or other unknown error: don't leak details to client
   } else {
-    console.error('ERROR 💥', err);
+    console.error('(!Operational)ERROR 💥', err);
 
     res.status(500).json({
       status: 'error',
