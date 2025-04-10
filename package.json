@@ -12,6 +12,7 @@
   "author": "Shaheer Mansoor",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "dotenv": "^16.4.7",
     "express": "^4.19.2",
     "mongoose": "^5.13.23",
