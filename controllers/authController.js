@@ -71,21 +71,21 @@ exports.protect = catchAsyncError(async (req, res, next) => {
   );
 
   // 3. Check User exists
-  const freshUser = await User.findById(decoded.id);
-  if (!freshUser) {
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
     return next(
       new AppError('User belonging to this token no longer exists', 401),
     );
   }
 
   // Check if user has changed his password
-  if (freshUser.passwordChangedAfter(decoded.iat)) {
+  if (currentUser.passwordChangedAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please login again', 401),
     );
   }
 
   // Grant access to the user
-  req.user = freshUser;
+  req.user = currentUser;
   next();
 });
