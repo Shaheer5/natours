@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const AppError = require('../utils/appError');
 const catchAsyncError = require('../utils/catchAsyncError');
 const User = require('./../models/userModel');
@@ -36,7 +37,7 @@ exports.login = catchAsyncError(async (req, res, next) => {
   }
   // 2. check if email and password are correct
   const user = await User.findOne({ email }).select('+password');
-  
+
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Email or Password is incorrect', 401));
   }
@@ -47,4 +48,44 @@ exports.login = catchAsyncError(async (req, res, next) => {
     status: 'success',
     token,
   });
+});
+
+exports.protect = catchAsyncError(async (req, res, next) => {
+  // 1. Checking if token exists
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+    // console.log(token);
+  }
+  if (!token) {
+    return next(new AppError('Please login to get access', 401));
+  }
+
+  // 2. Verification of token
+  const decoded = await promisify(jwt.verify)(
+    token,
+    process.env.JWT_SECRET_KEY,
+  );
+
+  // 3. Check User exists
+  const freshUser = await User.findById(decoded.id);
+  if (!freshUser) {
+    return next(
+      new AppError('User belonging to this token no longer exists', 401),
+    );
+  }
+
+  // Check if user has changed his password
+  if (freshUser.passwordChangedAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently changed password! Please login again', 401),
+    );
+  }
+
+  // Grant access to the user
+  req.user = freshUser;
+  next();
 });
